@@ -16,11 +16,16 @@ app.use(
     httpOnly: true,
   }),
 );
+
+app.use('/health', healthRouter);
+app.use('/user', userRouter);
+
 // add global exception handler middleware for AppError or other errors
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
   if (err instanceof AppError) {
     res.status(err.statusCode).json({ message: err.message });
+    return;
   } else if (
     (err as any).name === 'SequelizeValidationError' ||
     (err as any).name === 'SequelizeUniqueConstraintError'
@@ -29,12 +34,10 @@ app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
       status: StatusCodes.BAD_REQUEST,
       message: (err as any).errors?.[0]?.message || 'Validation failed',
     });
+    return;
   }
   res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
 });
-
-app.use('/health', healthRouter);
-app.use('/user', userRouter);
 
 (async () => {
   try {
