@@ -41,7 +41,7 @@ export default class User extends Model<UserAttributes> implements UserAttribute
     allowNull: false,
     validate: {
       notEmpty: { msg: 'Password is required' },
-      len: { args: [6, 50], msg: 'Password must be between 6 and 50 characters' },
+      min: { args: [6], msg: 'Password must be at least 6 characters' },
     },
   })
   password!: string;
