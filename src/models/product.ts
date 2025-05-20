@@ -7,7 +7,7 @@ export interface ProductAttributes {
   modelName: string;
   description: string;
   price: number;
-  publisher: number; // foreign key User.id
+  admin: number; // foreign key User.id
 }
 
 @Table({
@@ -65,11 +65,11 @@ export default class Product extends Model<ProductAttributes> implements Product
   @ForeignKey(() => User)
   @Column({
     type: DataType.INTEGER,
-    field: 'publisher',
+    field: 'admin',
     allowNull: false,
     validate: {
-      notEmpty: { msg: 'Publisher is required' },
+      notEmpty: { msg: 'admin is required' },
     },
   })
-  publisher!: number;
+  admin!: number;
 }

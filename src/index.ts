@@ -4,8 +4,10 @@ import { StatusCodes } from 'http-status-codes';
 import Database from './config/database';
 import { NODE_ENV, PORT } from './config/serverConfig';
 import healthRouter from './routes/health.route';
+import productRouter from './routes/product.route';
 import userRouter from './routes/user.route';
 import { AppError } from './utils/appError';
+import { getPayload } from './utils/jwtService';
 import { errorResponse } from './utils/response';
 const app = express();
 app.use(express.json());
@@ -17,9 +19,16 @@ app.use(
     httpOnly: true,
   }),
 );
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (req.session?.jwt) {
+    req.session.user = getPayload(req.session.jwt);
+  }
+  next();
+});
 
 app.use('/health', healthRouter);
 app.use('/user', userRouter);
+app.use('/product', productRouter);
 
 // add global exception handler middleware for AppError or other errors
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
