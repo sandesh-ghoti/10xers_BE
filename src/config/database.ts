@@ -1,6 +1,7 @@
 'use strict';
 
 import { Sequelize } from 'sequelize-typescript';
+import seed from '../seeders/create-system-admin';
 import { config, dialect } from './config';
 const env = 'development';
 const configProp = config[env];
@@ -9,7 +10,7 @@ class Database {
   public sequelize: Sequelize | undefined;
 
   constructor() {
-    this.connectToDatabase();
+    (async () => await this.connectToDatabase())();
   }
 
   private async connectToDatabase() {
@@ -39,6 +40,7 @@ class Database {
       .catch((err) => {
         console.error('Error syncing database:', err);
       });
+    await seed();
   }
 }
 

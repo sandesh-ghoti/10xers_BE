@@ -28,5 +28,6 @@ router.post(
 );
 router.post('/logout', UserController.logout);
 router.get('/current-user', UserController.currentUser);
+router.post('/register-admin', UserController.registerAdmin);
 
 export default router;

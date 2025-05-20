@@ -1,8 +1,5 @@
 import { Column, DataType, Model, Table } from 'sequelize-typescript';
-enum Role {
-  USER = 'user',
-  ADMIN = 'admin',
-}
+import { Role } from '../common';
 
 export interface UserAttributes {
   id?: number;
@@ -47,13 +44,13 @@ export default class User extends Model<UserAttributes> implements UserAttribute
   password!: string;
 
   @Column({
-    type: DataType.ENUM('user', 'admin'),
+    type: DataType.ENUM('user', 'admin', 'system_admin'),
     field: 'role',
     allowNull: false,
     defaultValue: 'user',
     validate: {
       isIn: {
-        args: [['user', 'admin']],
+        args: [['user', 'admin', 'system_admin']],
         msg: 'Role must be user or admin',
       },
     },

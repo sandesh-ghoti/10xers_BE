@@ -1,5 +1,6 @@
 import { scryptSync as scrypt } from 'crypto';
 import { StatusCodes } from 'http-status-codes';
+import { Role } from '../common';
 import { SALT } from '../config/serverConfig';
 import { UserRepository } from '../repository/user.repository';
 import { AppError } from '../utils/appError';
@@ -27,6 +28,15 @@ export class UserService {
     if (user.password !== hashedPassword) {
       throw new AppError('invalid credentials', StatusCodes.UNAUTHORIZED);
     }
+    return user;
+  }
+  async updateRole(email: string, role: Role) {
+    const user = await this.userRepository.findByEmail(email);
+    if (!user) {
+      throw new AppError('user not found', StatusCodes.NOT_FOUND);
+    }
+    user.role = role;
+    await user.save();
     return user;
   }
 }

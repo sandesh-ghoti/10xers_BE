@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { Role } from '../common';
 import { UserRepository } from '../repository/user.repository';
 import { UserService } from '../services/user.service';
 import { AppError } from '../utils/appError';
@@ -11,6 +12,9 @@ export class UserController {
   static async register(req: Request, res: Response) {
     const { email, password } = req.body;
     const user = await userService.create(email, password);
+    if (!user) {
+      throw new AppError('user not created', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
     res.status(StatusCodes.CREATED).json({ message: 'User created successfully' });
   }
   static async login(req: Request, res: Response) {
@@ -38,7 +42,7 @@ export class UserController {
     const token = req.session?.jwt;
 
     if (!token) {
-      res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Not authenticated' });
+      throw new AppError('Not authenticated', StatusCodes.UNAUTHORIZED);
     }
 
     try {
@@ -47,5 +51,23 @@ export class UserController {
     } catch {
       throw new AppError('Invalid token', StatusCodes.UNAUTHORIZED);
     }
+  }
+  static async registerAdmin(req: Request, res: Response) {
+    const token = req.session?.jwt;
+    if (!token) {
+      throw new AppError('Not authenticated', StatusCodes.UNAUTHORIZED);
+    }
+
+    const payload = getPayload(token) as any;
+    if (payload.role !== Role.SYSTEM_ADMIN) {
+      throw new AppError('Unauthorized', StatusCodes.UNAUTHORIZED);
+    }
+
+    const { email } = req.body;
+    const updateRole = await userService.updateRole(email, Role.ADMIN);
+    if (!updateRole) {
+      throw new AppError('user not updated', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+    res.status(StatusCodes.CREATED).json({ message: 'User created successfully' });
   }
 }
