@@ -6,6 +6,7 @@ import { NODE_ENV, PORT } from './config/serverConfig';
 import healthRouter from './routes/health.route';
 import userRouter from './routes/user.route';
 import { AppError } from './utils/appError';
+import { errorResponse } from './utils/response';
 const app = express();
 app.use(express.json());
 app.use(
@@ -30,13 +31,17 @@ app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
     (err as any).name === 'SequelizeValidationError' ||
     (err as any).name === 'SequelizeUniqueConstraintError'
   ) {
-    res.status(StatusCodes.BAD_REQUEST).json({
-      status: StatusCodes.BAD_REQUEST,
-      message: (err as any).errors?.[0]?.message || 'Validation failed',
+    let explanation: string[] = [];
+    (err as any).errors.forEach((e: Error) => {
+      explanation.push(e.message);
     });
+    const errorRes = errorResponse(explanation || 'Validation failed');
+    res.status(StatusCodes.BAD_REQUEST).json(errorRes);
     return;
   }
-  res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
+  res
+    .status(StatusCodes.INTERNAL_SERVER_ERROR)
+    .json(errorResponse('Something went wrong ' + err.message));
 });
 
 (async () => {

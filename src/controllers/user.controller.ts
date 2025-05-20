@@ -5,6 +5,7 @@ import { UserRepository } from '../repository/user.repository';
 import { UserService } from '../services/user.service';
 import { AppError } from '../utils/appError';
 import { getPayload, signjwt } from '../utils/jwtService';
+import { successResponse } from '../utils/response';
 
 const userService = new UserService(new UserRepository());
 
@@ -15,7 +16,7 @@ export class UserController {
     if (!user) {
       throw new AppError('user not created', StatusCodes.INTERNAL_SERVER_ERROR);
     }
-    res.status(StatusCodes.CREATED).json({ message: 'User created successfully' });
+    res.status(StatusCodes.CREATED).json(successResponse(null, 'User created successfully'));
   }
   static async login(req: Request, res: Response) {
     const { email, password } = req.body;
@@ -30,12 +31,12 @@ export class UserController {
 
     req.session = { jwt: userJwt };
 
-    res.status(StatusCodes.OK).json({ message: 'Logged in successfully', user });
+    res.status(StatusCodes.OK).json(successResponse(user, 'Logged in successfully'));
   }
 
   static async logout(req: Request, res: Response) {
     req.session = null;
-    res.status(StatusCodes.OK).json({ message: 'Logged out successfully' });
+    res.status(StatusCodes.OK).json(successResponse(null, 'Logged out successfully'));
   }
 
   static async currentUser(req: Request, res: Response) {
@@ -47,7 +48,7 @@ export class UserController {
 
     try {
       const payload = getPayload(token);
-      res.status(StatusCodes.OK).json({ user: payload });
+      res.status(StatusCodes.OK).json(successResponse(payload, 'User fetched successfully'));
     } catch {
       throw new AppError('Invalid token', StatusCodes.UNAUTHORIZED);
     }
@@ -68,6 +69,6 @@ export class UserController {
     if (!updateRole) {
       throw new AppError('user not updated', StatusCodes.INTERNAL_SERVER_ERROR);
     }
-    res.status(StatusCodes.CREATED).json({ message: 'User created successfully' });
+    res.status(StatusCodes.CREATED).json(successResponse(null, 'User updated successfully'));
   }
 }

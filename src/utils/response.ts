@@ -7,11 +7,11 @@ const successResponse = (data: any, message?: string) => {
   };
 };
 
-const errorResponse = (error: any, data?: any) => {
+const errorResponse = (message: string | Array<string>, error?: any) => {
   return {
     success: false,
-    message: 'failed',
-    data: data || {},
+    message,
+    data: {},
     error: error || {},
   };
 };
