@@ -20,6 +20,7 @@ app.use(
   }),
 );
 app.use((req: Request, res: Response, next: NextFunction) => {
+  if (req.url.includes('login') || req.url.includes('register')) return next();
   if (req.session?.jwt) {
     req.session.user = getPayload(req.session.jwt);
   }
