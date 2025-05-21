@@ -10,6 +10,14 @@ import { AppError } from './utils/appError';
 import { getPayload } from './utils/jwtService';
 import { errorResponse } from './utils/response';
 const app = express();
+// cors allow 5173
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
+
 app.use(express.json());
 app.use(
   cookieSession({
