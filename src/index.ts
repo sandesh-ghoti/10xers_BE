@@ -1,4 +1,5 @@
 import cookieSession from 'cookie-session';
+import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import Database from './config/database';
@@ -11,12 +12,12 @@ import { getPayload } from './utils/jwtService';
 import { errorResponse } from './utils/response';
 const app = express();
 // cors allow 5173
-app.use((req: Request, res: Response, next: NextFunction) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  next();
-});
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 app.use(
@@ -43,7 +44,8 @@ app.use('/product', productRouter);
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
   if (err instanceof AppError) {
-    res.status(err.statusCode).json({ message: err.message });
+    const errorRes = errorResponse(err.message);
+    res.status(err.statusCode).json(errorRes);
     return;
   } else if (
     (err as any).name === 'SequelizeValidationError' ||
