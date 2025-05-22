@@ -15,13 +15,13 @@ export class ProductController {
       throw new AppError('Not authenticated', StatusCodes.UNAUTHORIZED);
     }
 
-    const { brand, model, description, price } = req.body;
+    const { brand, modelName, description, price } = req.body;
     const admin = user.id;
 
     const product = await productService.create({
       brand,
       description,
-      modelName: model,
+      modelName,
       price,
       admin,
     });
@@ -99,11 +99,11 @@ export class ProductController {
     if (product.admin !== user.id) {
       throw new AppError('Unauthorized', StatusCodes.UNAUTHORIZED);
     }
-    const { brand, model, description, price } = req.body;
+    const { brand, modelName, description, price } = req.body;
     const result = await productService.updateProduct(Number(id), {
       brand,
       description,
-      modelName: model,
+      modelName,
       price,
       admin: user.id,
     });

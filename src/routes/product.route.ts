@@ -7,8 +7,11 @@ const router = Router();
 router.post(
   '/create',
   (req: Request, res: Response, next: NextFunction) => {
-    if (!req.body.brand || !req.body.model || !req.body.description || !req.body.price) {
-      throw new AppError('Brand, model, description and price required', StatusCodes.BAD_REQUEST);
+    if (!req.body.brand || !req.body.modelName || !req.body.description || !req.body.price) {
+      throw new AppError(
+        'Brand, modelName, description and price required',
+        StatusCodes.BAD_REQUEST,
+      );
     } else {
       next();
     }
