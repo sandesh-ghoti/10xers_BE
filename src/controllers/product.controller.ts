@@ -89,7 +89,7 @@ export class ProductController {
   static async updateProduct(req: Request, res: Response) {
     const { user } = req.session as any;
     if (!user || user.role !== Role.ADMIN) {
-      throw new AppError('Not authenticated', StatusCodes.UNAUTHORIZED);
+      throw new AppError('Not authenticated, or you are not admin', StatusCodes.UNAUTHORIZED);
     }
     const { id } = req.params;
     const product = await productService.findById(Number(id));

@@ -83,7 +83,7 @@ router.get(
 
 /**
  * @swagger
- * /product:
+ * /product/get:
  *   get:
  *     summary: Get all products
  *     tags: [Products]
@@ -91,7 +91,7 @@ router.get(
  *       200:
  *         description: List of all products
  */
-router.get('/', ProductController.getProducts);
+router.get('/get', ProductController.getProducts);
 
 /**
  * @swagger

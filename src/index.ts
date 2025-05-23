@@ -38,6 +38,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     req.url.includes('login') ||
     req.url.includes('register') ||
     req.url.includes('api-docs') ||
+    req.url.includes('product/get') ||
     req.url.includes('health')
   )
     return next();
