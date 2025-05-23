@@ -36,7 +36,7 @@ export class UserService {
       throw new AppError('user not found', StatusCodes.NOT_FOUND);
     }
     user.role = role;
-    await user.save();
-    return user;
+    const updatedUser = await this.userRepository.update(user.id, user);
+    return updatedUser;
   }
 }
