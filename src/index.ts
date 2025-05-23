@@ -2,15 +2,20 @@ import cookieSession from 'cookie-session';
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 import Database from './config/database';
 import { NODE_ENV, PORT } from './config/serverConfig';
+import { swaggerOptions } from './config/swaggerOptions';
 import healthRouter from './routes/health.route';
 import productRouter from './routes/product.route';
 import userRouter from './routes/user.route';
 import { AppError } from './utils/appError';
 import { getPayload } from './utils/jwtService';
 import { errorResponse } from './utils/response';
+
 const app = express();
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 // cors allow 5173
 app.use(
   cors({
@@ -29,7 +34,13 @@ app.use(
   }),
 );
 app.use((req: Request, res: Response, next: NextFunction) => {
-  if (req.url.includes('login') || req.url.includes('register')) return next();
+  if (
+    req.url.includes('login') ||
+    req.url.includes('register') ||
+    req.url.includes('api-docs') ||
+    req.url.includes('health')
+  )
+    return next();
   if (req.session?.jwt) {
     req.session.user = getPayload(req.session.jwt);
   }
@@ -64,11 +75,15 @@ app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
     .json(errorResponse('Something went wrong ' + err.message));
 });
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 (async () => {
   try {
     new Database();
     app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
+      console.log(
+        `Server is running on http://localhost:${PORT}\n Swagger UI: http://localhost:${PORT}/api-docs`,
+      );
     });
   } catch (error) {
     console.error('Unable to connect to the database:', error);
